@@ -5,58 +5,54 @@ void ofApp::setup(){
 	
 	world.setup(ofVec3f(0, -7808, 0));
 	
-//	bulb = world.addBox(ofVec3f(40,40,40), ofVec3f(0, 50, 0));
-//	bulb.setRestitution(0.5);
-////	bulb.setKinematic(false);
-//	bulb.setMass(0);
-//	bulb.setStatic(true);
-	
 	floor = world.addPlane(ofVec3f(0,1,0), ofVec3f(0,0,0));
-//	floor.setStatic(true);
 	floor.setRestitution(0.8);
 
-	ball = world.addSphere(50, ofVec3f(0,150,0));
-	ball.setMass(0.1);
-	ball.setRestitution(0.8);
+//	ball = world.addSphere(50, ofVec3f(0,150,0));
+//	ball.setMass(0.1);
+//	ball.setRestitution(0.8);
+
+	ofAddListener(world.collisionEvent, this, &ofApp::hit);
+
 	
-	for (int i = 0;i < 10;i++)
+	for (int i = 0;i < 49;i++)
 	{
-		ofNode nd;
-		nd.move(0, 50, 0);
-		nd.pan(-i * 36 + 90);
-		nd.dolly(50);
-		nd.tilt(45);
+		ofVec3f axis = ofVec3f((i % 7) * 150 - 450, 50,
+							   (i / 7) * 150 - 450);
 		
-		ofMatrix4x4 mat;
-//		mat.rotate(-i * 36 + 90, 0.0, 1.0, 0.0);
-//		
-//		mat.rotate(45, 1.0, 0.0, 0.0);
-//		mat.translate(cos(ofDegToRad(i * 36)) * 50, 100,
-//					  sin(ofDegToRad(i * 36)) * 50);
-		mat = nd.getGlobalTransformMatrix();
-		
-		cylinderCube[i] = world.addBox(ofVec3f(150, 100, 5), ofVec3f(0,0,0));
-		cylinderCube[i].setMass(0);
-		cylinderCube[i].setStatic(true);
-		cylinderCube[i].setTransform(mat);
-		cylinderCube[i].setRestitution(0.75);
+		balls[i] = world.addSphere(60, ofVec3f(0, 50, 0) + axis);
+		balls[i].setMass(0.1);
+		balls[i].setRestitution(0.8);
+		 
+		slots[i].setup(&world, axis);
 	}
 	
-	ofAddListener(world.collisionEvent, this, &ofApp::hit);
+	spMesh.set(60, 10);
+	camera.setDistance(1000);
+	
+	ofxBt::RigidBody wall;
+	
+	wall = world.addBox(ofVec3f(1000, 500, 10), ofVec3f(-520, 150, 0), ofVec3f(90, 0, 0));
+	wall.setMass(0);
+	wall.setStatic(true);
+	
+	wall = world.addBox(ofVec3f(1000, 500, 10), ofVec3f( 520, 150, 0), ofVec3f(90, 0, 0));
+	wall.setMass(0);
+	wall.setStatic(true);
+	
+	wall = world.addBox(ofVec3f(1000, 500, 10), ofVec3f(0, 150, 520), ofVec3f(0, 0, 0));
+	wall.setMass(0);
+	wall.setStatic(true);
+	
+	wall = world.addBox(ofVec3f(1000, 500, 10), ofVec3f(0, 150, -520), ofVec3f(0, 0, 0));
+	wall.setMass(0);
+	wall.setStatic(true);
 }
 
 //--------------------------------------------------------------
 void ofApp::update()
 {
 	world.update();
-	
-//	ofMatrix4x4 mat;
-//	mat.translate(0, ofGetMouseY(), 0);
-//	bulb.setTransform(mat);
-	
-	if (ofGetKeyPressed())
-	{
-	}
 }
 
 //--------------------------------------------------------------
@@ -64,20 +60,50 @@ void ofApp::draw()
 {
 	ofBackground(0, 0, 0);
 	camera.begin();
-	world.draw();
+	ofEnableDepthTest();
+	for (int i = 0;i < 49;i++)
+	{
+		ofPushMatrix();
+		ofMultMatrix(balls[i].getTransform());
+		ofFloatColor c;
+		c.setHsb(1.0 / 49.0 * i / 4.0 + 0.4, 0.8, 0.7);
+		ofSetColor(c);
+		spMesh.drawFaces();
+//		ofSetColor(255);
+//		spMesh.drawWireframe();
+		ofPopMatrix();
+		
+		slots[i].draw();
+	}
+//	world.draw();
+	ofDisableDepthTest();
 	camera.end();
+	
+	if ((bangSW > 0) && (ofGetFrameNum() % 5 == 0))
+	{
+		balls[bangSW - 1].applyForce(ofVec3f(ofRandomf() * 500,150 * 100,
+											 ofRandomf() * 500));
+		bangSW++;
+		if (bangSW == 49) bangSW = 0;
+	}
 }
 
 void ofApp::hit(ofxBt::World::CollisionEventArg &arg)
 {
-	cout << "Hit " << ofGetFrameNum() << endl;
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key)
 {
-	ball.applyForce(ofVec3f(ofRandomf() * 500,ofGetMouseY() * 100,
-							ofRandomf() * 500));
+	bangSW = 1;
+//	for (int i = 0;i < 49;i++)
+//	{
+//		balls[i].applyForce(ofVec3f(ofRandomf() * 500,ofGetMouseY() * 100,
+//									ofRandomf() * 500));
+//	}
+	
+//	ball.applyForce(ofVec3f(ofRandomf() * 500,ofGetMouseY() * 100,
+//							ofRandomf() * 500));
 
 }
 

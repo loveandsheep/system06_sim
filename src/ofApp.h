@@ -3,6 +3,8 @@
 #include "ofMain.h"
 #include "ofxBt.h"
 
+#include "slot.hpp"
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -25,11 +27,15 @@ class ofApp : public ofBaseApp{
 	ofxBt::World world;
 	ofxBt::RigidBody ball;
 	ofxBt::RigidBody floor;
-	ofxBt::RigidBody bulb;
 	
 	ofEasyCam camera;
 	
 	void hit(ofxBt::World::CollisionEventArg & arg);
 	
-	ofxBt::RigidBody cylinderCube[10];
+	ofxBt::RigidBody balls[49];
+	slot slots[49];
+	
+	ofSpherePrimitive spMesh;
+	
+	int bangSW;
 };
