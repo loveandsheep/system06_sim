@@ -16,10 +16,17 @@ class slot{
 public:
 	
 	void setup(ofxBt::World *world, ofVec3f pos);
-	void draw();
+	void draw(bool wire);
+	
+	void setShape(float rad, float angle, ofVec3f pos);
 	
 	vector<ofxBt::RigidBody> boxes;
 	ofMesh mesh;
+	
+	ofVec3f axis;
+	
+	int lastId;
+	bool isCatch;
 };
 
 #endif /* slot_hpp */

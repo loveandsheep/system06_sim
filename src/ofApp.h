@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxBt.h"
+#include "ofxGui.h"
 
 #include "slot.hpp"
 
@@ -33,9 +34,21 @@ class ofApp : public ofBaseApp{
 	void hit(ofxBt::World::CollisionEventArg & arg);
 	
 	ofxBt::RigidBody balls[49];
+	ofxBt::RigidBody walls[4];
+	ofxBt::RigidBody tenban[12];
 	slot slots[49];
 	
 	ofSpherePrimitive spMesh;
 	
 	int bangSW;
+	
+	ofxPanel gui;
+	ofParameter<float> slot_rad;
+	ofParameter<float> slot_angle;
+	ofParameter<float> slot_margine_w;
+	ofParameter<float> slot_margine_h;
+	ofParameter<float> tenban_height;
+	ofParameter<bool> drawWire;
+	
+	void renewSlot(float & val);
 };
